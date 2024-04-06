@@ -1,9 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { compare } from 'bcrypt';
-import { UserService } from 'src/user/user.service';
-import { LoginDto } from './dto/auth.dto';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import { compare } from "bcrypt";
+import { UserService } from "src/user/user.service";
+import { LoginDto } from "./dto/auth.dto";
 
 const EXPIRE_TIME = 20 * 1000;
 
@@ -12,23 +12,23 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
-    private configService: ConfigService,
+    private configService: ConfigService
   ) {}
 
   async refreshToken(user: any) {
     const payload = { email: user.email, sub: user.sub };
 
-    console.log('refresh payload', payload);
+    console.log("refresh payload", payload);
 
     return {
       backendTokens: {
         accessToken: await this.jwtService.signAsync(payload, {
-          expiresIn: '20s',
-          secret: this.configService.get('jwt.access'),
+          expiresIn: "1h",
+          secret: this.configService.get("jwt.access"),
         }),
         refreshTokenKey: await this.jwtService.signAsync(payload, {
-          expiresIn: '7d',
-          secret: this.configService.get('jwt.refresh'),
+          expiresIn: "7d",
+          secret: this.configService.get("jwt.refresh"),
         }),
         expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
       },
@@ -36,7 +36,7 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    console.log('login', dto);
+    console.log("login", dto);
     const user = await this.validateUser(dto);
     console.log(user);
 
@@ -51,12 +51,12 @@ export class AuthService {
       user,
       backendTokens: {
         accessToken: await this.jwtService.signAsync(payload, {
-          expiresIn: '20s',
-          secret: this.configService.get('jwt.access'),
+          expiresIn: "1h",
+          secret: this.configService.get("jwt.access"),
         }),
         refreshTokenKey: await this.jwtService.signAsync(payload, {
-          expiresIn: '7d',
-          secret: this.configService.get('jwt.refresh'),
+          expiresIn: "7d",
+          secret: this.configService.get("jwt.refresh"),
         }),
         expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
       },
