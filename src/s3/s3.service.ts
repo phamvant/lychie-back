@@ -1,15 +1,7 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { fromIni } from "@aws-sdk/credential-providers";
-import {
-  S3RequestPresigner,
-  getSignedUrl,
-} from "@aws-sdk/s3-request-presigner";
-import { formatUrl } from "@aws-sdk/util-format-url";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Hash } from "@smithy/hash-node";
-import { HttpRequest } from "@smithy/protocol-http";
-import { parseUrl } from "@smithy/url-parser";
 import { randomBytes } from "crypto";
 import https from "https";
 
@@ -17,22 +9,31 @@ import https from "https";
 export class S3BucketService {
   constructor(private configService: ConfigService) {}
 
-  private async createPresignedUrlWithoutClient({ region, bucket, key }) {
-    const url = parseUrl(`https://${bucket}.s3.${region}.amazonaws.com/${key}`);
-    const presigner = new S3RequestPresigner({
-      credentials: fromIni(),
-      region,
-      sha256: Hash.bind(null, "sha256"),
-    });
+  // private async createPresignedUrlWithoutClient({ region, bucket, key }) {
+  //   const url = parseUrl(`https://${bucket}.s3.${region}.amazonaws.com/${key}`);
+  //   const presigner = new S3RequestPresigner({
+  //     credentials: {
+  //       accessKeyId: this.configService.get("aws.access_id"),
+  //       secretAccessKey: this.configService.get("aws.secret_key"),
+  //     },
+  //     region,
+  //     sha256: Hash.bind(null, "sha256"),
+  //   });
 
-    const signedUrlObject = await presigner.presign(
-      new HttpRequest({ ...url, method: "PUT" })
-    );
-    return formatUrl(signedUrlObject);
-  }
+  //   const signedUrlObject = await presigner.presign(
+  //     new HttpRequest({ ...url, method: "PUT" })
+  //   );
+  //   return formatUrl(signedUrlObject);
+  // }
 
   private async createPresignedUrlWithClient({ region, bucket, key }) {
-    const client = new S3Client({ region });
+    const client = new S3Client({
+      region: this.configService.get("aws.region"),
+      credentials: {
+        accessKeyId: this.configService.get("aws.access_id"),
+        secretAccessKey: this.configService.get("aws.secret_key"),
+      },
+    });
     const command = new PutObjectCommand({ Bucket: bucket, Key: key });
     return getSignedUrl(client, command, { expiresIn: 3600 });
   }

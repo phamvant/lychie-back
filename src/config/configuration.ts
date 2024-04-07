@@ -10,6 +10,8 @@ export default () => {
       },
       aws: {
         region: process.env.AWS_CONFIG_REGION,
+        access_id: process.env.AWS_ACCESS_KEY_ID,
+        secret_key: process.env.AWS_SECRET_ACCESS_KEY,
       },
     };
 
@@ -21,10 +23,15 @@ export default () => {
       db: {
         host: process.env.DATABASE_URL_PRO,
       },
+      aws: {
+        region: process.env.AWS_CONFIG_REGION,
+        access_id: process.env.AWS_ACCESS_KEY_ID,
+        secret_key: process.env.AWS_SECRET_ACCESS_KEY,
+      },
     };
 
     const env = { dev, pro };
 
-    return env["dev"];
+    return env["pro"];
   }
 };
