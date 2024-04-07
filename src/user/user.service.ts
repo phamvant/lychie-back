@@ -2,10 +2,10 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { hash } from 'bcrypt';
-import { PrismaService } from 'src/prisma.service';
-import { CreateUserDto } from './dto/user.dto';
+} from "@nestjs/common";
+import { hash } from "bcrypt";
+import { PrismaService } from "src/prisma.service";
+import { CreateUserDto } from "./dto/user.dto";
 
 @Injectable()
 export class UserService {
@@ -17,20 +17,20 @@ export class UserService {
   async create(dto: CreateUserDto) {
     const user = await this.prisma.user.findUnique({
       where: {
-        email: dto.email,
+        userEmail: dto.userEmail,
       },
     });
 
-    if (user) throw new ConflictException('email duplicated');
+    if (user) throw new ConflictException("email duplicated");
 
     const newUser = await this.prisma.user.create({
-      data: { ...dto, password: await hash(dto.password, 10) },
+      data: { ...dto, userPassword: await hash(dto.userPassword, 10) },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...res } = newUser;
+    const { userPassword, ...res } = newUser;
 
-    console.log('created', res);
+    console.log("created", res);
     return res;
   }
 
@@ -38,35 +38,35 @@ export class UserService {
   /// findByEmail
   //////////////////////////////////
   async findByEmail(email: string) {
-    console.log('find email', email);
+    console.log("find email", email);
     const user = await this.prisma.user.findUnique({
       where: {
-        email: email,
+        userEmail: email,
       },
     });
 
-    console.log('user found', user);
+    console.log("user found", user);
 
     if (user) return user;
 
-    console.log('not found');
+    console.log("not found");
     throw new NotFoundException();
   }
 
   //////////////////////////////////
   /// findById
   //////////////////////////////////
-  async findById(id: string) {
+  async findById(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: {
-        id: id,
+        userId: userId,
       },
     });
 
     if (user) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...res } = user;
-      console.log('found by id', res);
+      const { userPassword, ...res } = user;
+      console.log("found by id", res);
       return res;
     }
 

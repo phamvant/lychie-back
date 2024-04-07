@@ -1,13 +1,6 @@
-import {
-  Controller,
-  Post,
-  Request,
-  UploadedFiles,
-  UseGuards,
-  UseInterceptors,
-} from "@nestjs/common";
-import { AnyFilesInterceptor } from "@nestjs/platform-express";
+import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guards/jwt.guard";
+import { CreateProductDto } from "./dto/product.dto";
 import { ProductService } from "./product.service";
 
 // @Controller("product")
@@ -27,15 +20,14 @@ export class ProductController {
 
   @UseGuards(JwtGuard)
   @Post("create")
-  async createProduct(@Request() req) {
-    return await this.productService.createProduct(req);
+  async createProduct(@Body() dto: CreateProductDto) {
+    console.log(dto);
+    return await this.productService.createProduct(dto);
   }
 
   @UseGuards(JwtGuard)
-  @Post("updateImage")
-  @UseInterceptors(AnyFilesInterceptor())
-  async updateProductImage(@UploadedFiles() files: Array<Express.Multer.File>) {
-    console.log(files);
-    return await this.productService.updateProductImage(files);
+  @Get("")
+  async getAllProduct() {
+    return this.productService.getAllProduct();
   }
 }

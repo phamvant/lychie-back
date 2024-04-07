@@ -11,21 +11,28 @@ generator client {
 }
 
 model User {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  email    String  @unique
-  name     String?
-  username String?
-  password String
-  avatar   String?
-
-  image String?
-  // Post    Post[]
-  // Comment Comment[]
-  // Vote    Vote[]
+  userId       String  @id @default(auto()) @map("_id") @db.ObjectId
+  userEmail    String  @unique
+  userName     String?
+  userUsername String
+  userPassword String
+  userAvatar   String?
 }
 
-model Post {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  title  String
-  userId String @db.ObjectId
+model Product {
+  productId          String   @id @default(auto()) @map("_id") @db.ObjectId
+  productName        String   @unique
+  productDescription String
+  productCostPrice   String
+  productPrice       String
+  productVariants    Json
+  productSubCategory String
+  productCategory    String
+  productImages      String[]
+}
+
+model Category {
+  categoryId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName String   @unique
+  subCategory  String[]
 }

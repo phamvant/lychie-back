@@ -8,6 +8,9 @@ export default () => {
       db: {
         host: process.env.DATABASE_URL_DEV,
       },
+      aws: {
+        region: process.env.AWS_CONFIG_REGION,
+      },
     };
 
     const pro = {
@@ -22,6 +25,6 @@ export default () => {
 
     const env = { dev, pro };
 
-    return env['dev'];
+    return env["dev"];
   }
 };

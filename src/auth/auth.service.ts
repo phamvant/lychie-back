@@ -41,9 +41,9 @@ export class AuthService {
     console.log(user);
 
     const payload = {
-      email: user.email,
+      email: user.userEmail,
       sub: {
-        username: user.username,
+        username: user.userUsername,
       },
     };
 
@@ -66,9 +66,9 @@ export class AuthService {
   async validateUser(dto: LoginDto) {
     const user = await this.userService.findByEmail(dto.email);
 
-    if (user && (await compare(dto.password, user.password))) {
+    if (user && (await compare(dto.password, user.userPassword))) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...res } = user;
+      const { userPassword, ...res } = user;
       return res;
     }
 
