@@ -15,8 +15,8 @@ export default () => {
 
     const pro = {
       jwt: {
-        access: process.env.JWT_ACCESS_KEY_DEV,
-        refresh: process.env.JWT_REFRESH_KEY_DEV,
+        access: process.env.JWT_ACCESS_KEY_PRO,
+        refresh: process.env.JWT_REFRESH_KEY_PRO,
       },
       db: {
         host: process.env.DATABASE_URL_PRO,

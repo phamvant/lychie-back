@@ -36,6 +36,16 @@ export class ProductService {
     return products;
   }
 
+  async getProductById(productId: string) {
+    const product = await this.prisma.product.findFirst({
+      where: {
+        productId: productId,
+      },
+    });
+    console.log(product);
+    return product;
+  }
+
   // async updateProductImage(files) {
   //   for (let i = 0; i < files.length; i++) {
   //     if (files[i].originalname !== "blob") {
