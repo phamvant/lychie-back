@@ -13,6 +13,8 @@ export class CreateProductDto {
   productCategory: string;
   @IsString()
   productSubCategory: string;
+  @IsString()
+  productMemo: string;
   @IsObject()
   productVariants: any;
   @IsArray()

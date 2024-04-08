@@ -26,6 +26,7 @@ model Product {
   productCostPrice   String
   productPrice       String
   productVariants    Json
+  productMemo        String
   productSubCategory String
   productCategory    String
   productImages      String[]
