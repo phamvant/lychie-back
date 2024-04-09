@@ -20,16 +20,19 @@ model User {
 }
 
 model Product {
-  productId          String   @id @default(auto()) @map("_id") @db.ObjectId
-  productName        String   @unique
-  productDescription String
-  productCostPrice   String
-  productPrice       String
-  productVariants    Json
-  productMemo        String
-  productSubCategory String
-  productCategory    String
-  productImages      String[]
+  productId             String   @id @default(auto()) @map("_id") @db.ObjectId
+  productName           String   @unique
+  productDescription    String
+  productCostPrice      Int
+  productPrice          Int
+  productFinalPrice     Int
+  productVariants       Json
+  productDiscountType   String
+  productDiscountAmount Int?
+  productMemo           String
+  productSubCategory    String
+  productCategory       String
+  productImages         String[]
 }
 
 model Category {
