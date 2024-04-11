@@ -30,13 +30,13 @@ model Product {
   productDiscountType   String
   productDiscountAmount Int?
   productMemo           String
-  productSubCategory    String
   productCategory       String
+  productSubCategory    String
   productImages         String[]
 }
 
 model Category {
-  categoryId   String   @id @default(auto()) @map("_id") @db.ObjectId
-  categoryName String   @unique
-  subCategory  String[]
+  categoryId      String   @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName    String   @unique
+  categorySubName String[]
 }
