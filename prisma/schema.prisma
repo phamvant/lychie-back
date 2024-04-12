@@ -40,3 +40,25 @@ model Category {
   categoryName    String   @unique
   categorySubName String[]
 }
+
+// model Cart {
+//   cartId  String        @id @default(auto()) @map("_id") @db.ObjectId
+//   Product CartProduct[]
+// }
+
+// model CartProduct {
+//   cartProductId    String  @id @default(auto()) @map("_id") @db.ObjectId
+//   productId        String
+//   productName      String
+//   productVariant   Variant @relation(fields: [variantVariantId], references: [variantId])
+//   Cart             Cart?   @relation(fields: [cartCartId], references: [cartId])
+//   cartCartId       String? @db.ObjectId
+//   variantVariantId String  @db.ObjectId
+// }
+
+// model Variant {
+//   variantId   String        @id @default(auto()) @map("_id") @db.ObjectId
+//   color       String[]
+//   size        String
+//   CartProduct CartProduct[]
+// }

@@ -15,7 +15,7 @@ export class CategoryService {
       category.categoryName
     );
 
-    if (existedCategory.categorySubName === category.categorySubName) {
+    if (existedCategory.categorySubName.includes(category.categorySubName[0])) {
       throw new ConflictException("category existed");
     }
 
@@ -26,7 +26,7 @@ export class CategoryService {
         },
         data: {
           categorySubName: {
-            push: category.categorySubName,
+            push: category.categorySubName[0],
           },
         },
       });
