@@ -1,10 +1,14 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
+import { UserService } from "src/user/user.service";
 import { CreateProductDto } from "./dto/product.dto";
 
 @Injectable()
 export class ProductService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private userService: UserService
+  ) {}
 
   async findProductByName(productName: string) {
     const product = await this.prisma.product.findFirst({
@@ -16,16 +20,14 @@ export class ProductService {
     return product;
   }
 
-  async createProduct(dto: CreateProductDto) {
-    const product = await this.findProductByName(dto.productName);
-
-    if (product) {
-      throw new ConflictException("Product existed");
-    }
-
+  async createProduct(dto: CreateProductDto, req: Request) {
     const newProduct = await this.prisma.product.create({
       data: dto,
     });
+
+    await this.userService.updateUserProductAmount(
+      req["user"]["sub"]["username"]
+    );
 
     return newProduct.productName;
   }
@@ -42,8 +44,31 @@ export class ProductService {
         productId: productId,
       },
     });
-    console.log(product);
     return product;
+  }
+
+  async modifyProduct(productId: string, updateValue: Record<string, any>) {
+    const product = await this.getProductById(productId);
+
+    if (!product) {
+      throw new BadRequestException();
+    }
+
+    const updateData: any = {};
+    for (const key in updateValue) {
+      if (product.hasOwnProperty(key)) {
+        updateData[key] = updateValue[key];
+      }
+    }
+
+    const a = await this.prisma.product.update({
+      where: {
+        productId: productId,
+      },
+      data: updateData,
+    });
+
+    return updateValue;
   }
 
   // async updateProductImage(files) {

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Request,
+  UseGuards,
+} from "@nestjs/common";
 import { JwtGuard } from "src/auth/guards/jwt.guard";
 import { CreateProductDto } from "./dto/product.dto";
 import { ProductService } from "./product.service";
@@ -20,9 +29,9 @@ export class ProductController {
 
   @UseGuards(JwtGuard)
   @Post("create")
-  async createProduct(@Body() dto: CreateProductDto) {
+  async createProduct(@Body() dto: CreateProductDto, @Request() req) {
     console.log(dto);
-    return await this.productService.createProduct(dto);
+    return await this.productService.createProduct(dto, req);
   }
 
   @UseGuards(JwtGuard)
@@ -35,5 +44,14 @@ export class ProductController {
   @Get(":productId")
   async getProductById(@Param("productId") productId: string) {
     return this.productService.getProductById(productId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Put("modify/:productId")
+  async modifyProduct(
+    @Param("productId") productId: string,
+    @Body() updateValues: Record<string, any>
+  ) {
+    return this.productService.modifyProduct(productId, updateValues);
   }
 }

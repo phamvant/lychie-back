@@ -24,7 +24,11 @@ export class UserService {
     if (user) throw new ConflictException("email duplicated");
 
     const newUser = await this.prisma.user.create({
-      data: { ...dto, userPassword: await hash(dto.userPassword, 10) },
+      data: {
+        ...dto,
+        userPassword: await hash(dto.userPassword, 10),
+        userProductsAmount: 0,
+      },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -61,15 +65,35 @@ export class UserService {
       where: {
         userId: userId,
       },
+      select: {
+        userId: true,
+        userEmail: true,
+        userProductsAmount: true,
+        userUsername: true,
+        userPassword: false,
+      },
     });
 
     if (user) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { userPassword, ...res } = user;
-      console.log("found by id", res);
-      return res;
+      return user;
     }
 
     throw new NotFoundException();
+  }
+
+  //////////////////////////////////
+  /// updateUserProductAmount
+  //////////////////////////////////
+  async updateUserProductAmount(userName: string) {
+    await this.prisma.user.update({
+      where: {
+        userUsername: userName,
+      },
+      data: {
+        userProductsAmount: {
+          increment: 1,
+        },
+      },
+    });
   }
 }

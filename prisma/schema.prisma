@@ -11,17 +11,19 @@ generator client {
 }
 
 model User {
-  userId       String  @id @default(auto()) @map("_id") @db.ObjectId
-  userEmail    String  @unique
-  userName     String?
-  userUsername String
-  userPassword String
-  userAvatar   String?
+  userId             String  @id @default(auto()) @map("_id") @db.ObjectId
+  userEmail          String  @unique
+  userName           String?
+  userUsername       String  @unique
+  userPassword       String
+  userAvatar         String?
+  userProductsAmount Int
 }
 
 model Product {
   productId             String   @id @default(auto()) @map("_id") @db.ObjectId
-  productName           String   @unique
+  productName           String?  @unique
+  productCode           String
   productDescription    String
   productCostPrice      Int
   productPrice          Int
@@ -33,6 +35,7 @@ model Product {
   productCategory       String
   productSubCategory    String
   productImages         String[]
+  productIsPosted       Boolean
 }
 
 model Category {
