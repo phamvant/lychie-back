@@ -52,6 +52,7 @@ export class ProductController {
     @Param("productId") productId: string,
     @Body() updateValues: Record<string, any>
   ) {
+    console.log("Modify request : ", productId, "->", updateValues);
     return this.productService.modifyProduct(productId, updateValues);
   }
 }

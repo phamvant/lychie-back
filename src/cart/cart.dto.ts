@@ -1,5 +1,12 @@
+import { IsNumber, IsObject, IsString } from "class-validator";
+
 export class AddProductToCardDto {
-  productId: string;
-  productName: string;
-  productVariant: any;
+  @IsString()
+  cartProductId: string;
+  @IsString()
+  cartProductName: string;
+  @IsObject()
+  cartProductVariant: any;
+  @IsNumber()
+  cartProductAmount: number;
 }

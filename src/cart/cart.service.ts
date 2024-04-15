@@ -6,5 +6,5 @@ import { AddProductToCardDto } from "./cart.dto";
 export class CartService {
   constructor(private prismaService: PrismaService) {}
 
-  async addProductToCart(newPoduct: AddProductToCardDto) {}
+  async addProductToCart(productId: string, newProduct: AddProductToCardDto) {}
 }
