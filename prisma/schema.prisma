@@ -21,8 +21,8 @@ model User {
 }
 
 model Product {
-  productId             String   @id @default(auto()) @map("_id") @db.ObjectId
-  productName           String?  @unique
+  productId             String        @id @default(auto()) @map("_id") @db.ObjectId
+  productName           String?       @unique
   productCode           String
   productDescription    String
   productCostPrice      Int
@@ -36,6 +36,7 @@ model Product {
   productSubCategory    String
   productImages         String[]
   productIsPosted       Boolean
+  CartProduct           CartProduct[]
 }
 
 model Category {
@@ -45,6 +46,16 @@ model Category {
 }
 
 model Cart {
-  cartId       String @id @default(auto()) @map("_id") @db.ObjectId
-  cartProducts Json[]
+  cartId       String        @id @default(auto()) @map("_id") @db.ObjectId
+  cartProducts CartProduct[]
+}
+
+model CartProduct {
+  cartProductId      String  @id @map("_id") @db.ObjectId
+  cartProduct        Product @relation(fields: [cartProductId], references: [productId])
+  cartProductCode    String
+  cartProductVariant Json
+  cartProductAmount  Int
+  Cart               Cart?   @relation(fields: [cartCartId], references: [cartId])
+  cartCartId         String? @db.ObjectId
 }

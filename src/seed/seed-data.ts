@@ -10,3 +10,5 @@ export const seedData: CategoryDto[] = [
     categorySubName: ["Boots", "Quần", "Áo"],
   },
 ];
+
+export const seedCart: string = "661e9520d5c458cbcfcf3117";

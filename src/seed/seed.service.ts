@@ -6,24 +6,35 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class SeedService {
   constructor(private prismaService: PrismaService) {}
 
-  async seedDatabase(category: CategoryDto[]) {
+  async seedDatabase(category: CategoryDto[], cartId: string) {
     const existed = await this.prismaService.category.findFirst({
       where: {
         categoryName: category[0].categoryName,
       },
     });
 
-    if (existed) {
-      console.log("Existed");
-      return;
-    }
-
-    const newCategory = await this.prismaService.category.createMany({
-      data: category,
+    const existedCart = await this.prismaService.cart.findFirst({
+      where: {
+        cartId: cartId,
+      },
     });
 
-    if (newCategory) {
-      console.log("Insert Success");
+    if (!existed) {
+      const newCategory = await this.prismaService.category.createMany({
+        data: category,
+      });
+
+      console.log("created category");
+    }
+
+    if (!existedCart) {
+      const newCart = await this.prismaService.cart.create({
+        data: {
+          cartId: cartId,
+        },
+      });
+
+      console.log("created cart");
     }
   }
 }

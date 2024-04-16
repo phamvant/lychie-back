@@ -1,10 +1,14 @@
-import { Body, Controller, Post, UseGuards } from "@nestjs/common";
-import { JwtGuard } from "src/auth/guards/jwt.guard";
+import { Body, Controller, Post } from "@nestjs/common";
 import { AddProductToCardDto } from "./cart.dto";
+import { CartService } from "./cart.service";
 
 @Controller("cart")
 export class CartController {
-  @UseGuards(JwtGuard)
-  @Post("add/:productId")
-  async addProductToCart(@Body() product: AddProductToCardDto) {}
+  constructor(private cartService: CartService) {}
+
+  // @UseGuards(JwtGuard)
+  @Post("add")
+  async addProductToCart(@Body() product: AddProductToCardDto) {
+    return await this.cartService.addProductToCart(product);
+  }
 }

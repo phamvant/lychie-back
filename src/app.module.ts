@@ -13,7 +13,7 @@ import { PrismaService } from "./prisma/prisma.service";
 import { ProductModule } from "./product/product.module";
 import { ProductService } from "./product/product.service";
 import { S3BucketModule } from "./s3/s3.module";
-import { seedData } from "./seed/seed-data";
+import { seedCart, seedData } from "./seed/seed-data";
 import { SeedService } from "./seed/seed.service";
 import { UserModule } from "./user/user.module";
 import { UserService } from "./user/user.service";
@@ -42,6 +42,6 @@ import { UserService } from "./user/user.service";
 export class AppModule {
   constructor(private seedService: SeedService) {}
   async onModuleInit() {
-    await this.seedService.seedDatabase(seedData); // Seed the database only on first startup}
+    await this.seedService.seedDatabase(seedData, seedCart); // Seed the database only on first startup}
   }
 }

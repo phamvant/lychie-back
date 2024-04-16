@@ -4,7 +4,7 @@ export class AddProductToCardDto {
   @IsString()
   cartProductId: string;
   @IsString()
-  cartProductName: string;
+  cartProductCode: string;
   @IsObject()
   cartProductVariant: any;
   @IsNumber()
