@@ -51,11 +51,11 @@ model Cart {
 }
 
 model CartProduct {
-  cartProductId      String  @id @map("_id") @db.ObjectId
-  cartProduct        Product @relation(fields: [cartProductId], references: [productId])
-  cartProductCode    String
-  cartProductVariant Json
-  cartProductAmount  Int
-  Cart               Cart?   @relation(fields: [cartCartId], references: [cartId])
-  cartCartId         String? @db.ObjectId
+  cartProductId       String  @id @default(auto()) @map("_id") @db.ObjectId
+  productId           String  @db.ObjectId
+  cartProduct         Product @relation(fields: [productId], references: [productId])
+  cartProductVariants Json
+  cartProductAmount   Int
+  Cart                Cart?   @relation(fields: [cartCartId], references: [cartId])
+  cartCartId          String? @db.ObjectId
 }

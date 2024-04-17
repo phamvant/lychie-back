@@ -61,7 +61,7 @@ export class ProductService {
       }
     }
 
-    const a = await this.prisma.product.update({
+    await this.prisma.product.update({
       where: {
         productId: productId,
       },
