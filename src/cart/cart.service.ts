@@ -24,7 +24,7 @@ export class CartService {
 
   async addProductToCart(newProduct: AddProductToCardDto) {
     const existedProduct = await this.prismaService.cartProduct.findMany({
-      where: { cartProductId: newProduct.productId },
+      where: { productId: newProduct.productId },
     });
 
     if (existedProduct) {
