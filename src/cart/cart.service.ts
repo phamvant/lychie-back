@@ -19,6 +19,7 @@ export class CartService {
         },
       },
     });
+
     return allCartProduct;
   }
 
@@ -28,15 +29,20 @@ export class CartService {
     });
 
     if (existedProduct) {
-      const duplicated = existedProduct.filter(
-        (product) =>
-          !Object.keys(
-            getChangedFields(
-              product.cartProductVariants,
-              newProduct.cartProductVariants
-            )
-          ).length
-      )[0];
+      const duplicated = existedProduct
+        .filter(
+          (product) =>
+            !Object.keys(
+              getChangedFields(
+                product.cartProductVariants,
+                newProduct.cartProductVariants
+              )
+            ).length
+        )
+        ?.find(
+          (duplicate) =>
+            duplicate.cartCustomerName == newProduct.cartCustomerName
+        );
 
       if (duplicated) {
         const updated = await this.updateProductAmount(

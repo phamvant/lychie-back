@@ -7,6 +7,8 @@ export class AddProductToCardDto {
   cartProductVariants: any;
   @IsNumber()
   cartProductAmount: number;
+  @IsString()
+  cartCustomerName: string;
 }
 
 export class ChangeCartProductAmountDto {
