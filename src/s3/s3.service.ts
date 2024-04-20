@@ -5,7 +5,7 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { randomBytes } from "crypto";
 import https from "https";
@@ -96,7 +96,7 @@ export class S3BucketService {
 
     const response = await S3BucketService.client.send(command);
 
-    return response.Contents.map((object) => {
+    return response.Contents?.map((object) => {
       return { Key: object.Key };
     });
   }
@@ -110,7 +110,7 @@ export class S3BucketService {
     )) as any;
 
     if (!objectsKey) {
-      throw new NotFoundException("No bucket found");
+      return false;
     }
 
     const command = new DeleteObjectsCommand({
