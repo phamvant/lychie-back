@@ -3,5 +3,8 @@ default:
     - docker info
 
 build_image:
+  image: docker
   script:
     - docker build -t lychie-back-repo .
+  services:
+    - docker
