@@ -9,11 +9,11 @@ export class S3BucketController {
   @UseGuards(JwtGuard)
   @Get("image-upload-url")
   async getImageUploadUrl(
-    @Query("productName") productName: string,
+    @Query("productCode") productCode: string,
     @Query("volume") volume: number
   ) {
     const uploadUrl = this.s3BucketService.getImageUploadUrl(
-      productName,
+      productCode,
       volume
     );
 

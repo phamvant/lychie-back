@@ -18,6 +18,8 @@ model User {
   userPassword       String
   userAvatar         String?
   userProductsAmount Int
+  userCart           Cart    @relation(fields: [cartCartId], references: [cartId])
+  cartCartId         String  @db.ObjectId
 }
 
 model Product {
@@ -48,6 +50,7 @@ model Category {
 model Cart {
   cartId       String        @id @default(auto()) @map("_id") @db.ObjectId
   cartProducts CartProduct[]
+  User         User[]
 }
 
 model CartProduct {

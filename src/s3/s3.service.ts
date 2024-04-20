@@ -1,6 +1,11 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectsCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { randomBytes } from "crypto";
 import https from "https";
@@ -9,33 +14,21 @@ import https from "https";
 export class S3BucketService {
   constructor(private configService: ConfigService) {}
 
-  // private async createPresignedUrlWithoutClient({ region, bucket, key }) {
-  //   const url = parseUrl(`https://${bucket}.s3.${region}.amazonaws.com/${key}`);
-  //   const presigner = new S3RequestPresigner({
-  //     credentials: {
-  //       accessKeyId: this.configService.get("aws.access_id"),
-  //       secretAccessKey: this.configService.get("aws.secret_key"),
-  //     },
-  //     region,
-  //     sha256: Hash.bind(null, "sha256"),
-  //   });
+  static client;
 
-  //   const signedUrlObject = await presigner.presign(
-  //     new HttpRequest({ ...url, method: "PUT" })
-  //   );
-  //   return formatUrl(signedUrlObject);
-  // }
-
-  private async createPresignedUrlWithClient({ region, bucket, key }) {
-    const client = new S3Client({
+  async onModuleInit() {
+    S3BucketService.client = new S3Client({
       region: this.configService.get("aws.region"),
       credentials: {
         accessKeyId: this.configService.get("aws.access_id"),
         secretAccessKey: this.configService.get("aws.secret_key"),
       },
     });
+  }
+
+  private async createPresignedUrlWithClient({ region, bucket, key }) {
     const command = new PutObjectCommand({ Bucket: bucket, Key: key });
-    return getSignedUrl(client, command, { expiresIn: 3600 });
+    return getSignedUrl(S3BucketService.client, command, { expiresIn: 3600 });
   }
 
   async put(url, data) {
@@ -79,12 +72,12 @@ export class S3BucketService {
     }
   }
 
-  async getImageUploadUrl(productName: string, volume: number) {
+  async getImageUploadUrl(productCode: string, volume: number) {
     const uploadUrl = [];
 
     while (volume > 0) {
       const rawBytes = randomBytes(16);
-      const imageName = `${productName.toString()}/` + rawBytes.toString("hex");
+      const imageName = `${productCode.toString()}/` + rawBytes.toString("hex");
 
       const url = await this.getUrl("lychiebucket", imageName);
       uploadUrl.push(url);
@@ -92,5 +85,43 @@ export class S3BucketService {
     }
 
     return uploadUrl;
+  }
+
+  async getObjectsListObjects(productCode: string, bucket = "lychiebucket") {
+    const command = new ListObjectsV2Command({
+      Bucket: bucket,
+      MaxKeys: 10,
+      Prefix: productCode,
+    });
+
+    const response = await S3BucketService.client.send(command);
+
+    return response.Contents.map((object) => {
+      return { Key: object.Key };
+    });
+  }
+
+  async deleteImageFolder(productCode: string) {
+    const BUCKET = "lychiebucket";
+
+    const objectsKey = (await this.getObjectsListObjects(
+      productCode,
+      BUCKET
+    )) as any;
+
+    if (!objectsKey) {
+      throw new NotFoundException("No bucket found");
+    }
+
+    const command = new DeleteObjectsCommand({
+      Bucket: BUCKET,
+      Delete: {
+        Objects: objectsKey,
+      },
+    });
+
+    const response = await S3BucketService.client.send(command);
+
+    return { response };
   }
 }

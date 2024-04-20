@@ -85,4 +85,14 @@ export class CartService {
 
     return { deletedProduct };
   }
+
+  async findProductInCartById(productId: string) {
+    const isProductInCart = await this.prismaService.cartProduct.findFirst({
+      where: {
+        productId: productId,
+      },
+    });
+
+    return isProductInCart ? true : false;
+  }
 }

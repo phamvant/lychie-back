@@ -55,4 +55,10 @@ export class ProductController {
     console.log("Modify request : ", productId, "->", updateValues);
     return this.productService.modifyProduct(productId, updateValues);
   }
+
+  @UseGuards(JwtGuard)
+  @Put("delete")
+  async deleteProduct(@Body() productId: { productId: string }) {
+    return await this.productService.deleteProduct(productId);
+  }
 }

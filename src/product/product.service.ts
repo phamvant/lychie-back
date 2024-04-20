@@ -1,5 +1,11 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { CartService } from "src/cart/cart.service";
 import { PrismaService } from "src/prisma/prisma.service";
+import { S3BucketService } from "src/s3/s3.service";
 import { UserService } from "src/user/user.service";
 import { CreateProductDto } from "./dto/product.dto";
 
@@ -7,7 +13,9 @@ import { CreateProductDto } from "./dto/product.dto";
 export class ProductService {
   constructor(
     private prisma: PrismaService,
-    private userService: UserService
+    private userService: UserService,
+    private cartService: CartService,
+    private s3Service: S3BucketService
   ) {}
 
   async findProductByName(productName: string) {
@@ -69,6 +77,33 @@ export class ProductService {
     });
 
     return updateValue;
+  }
+
+  async deleteProduct({ productId }: { productId: string }) {
+    const product = await this.getProductById(productId);
+
+    if (!product) {
+      throw new NotFoundException("No product found");
+    }
+
+    const isProductInCart =
+      await this.cartService.findProductInCartById(productId);
+
+    if (isProductInCart) {
+      throw new BadRequestException("Product in cart");
+    }
+
+    const deletedImages = this.s3Service.deleteImageFolder(product.productCode);
+
+    if (!deletedImages) {
+      throw new BadRequestException("Cant delete s3 image");
+    }
+
+    const deletedProduct = await this.prisma.product.delete({
+      where: { productId: productId },
+    });
+
+    return { deletedProduct };
   }
 
   // async updateProductImage(files) {
