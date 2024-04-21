@@ -7,35 +7,26 @@ default:
   tags:
     - docker
 
-workfllow:
-  rules:
-    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
-    - if: "$CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH"
-      when: never
-
 stages:
   - build
-  - push
 
 .build:
-before_script:
-  - apk add --no-cache curl jq python3 py3-pip
-  - pip install awscli
-  - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-  - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-  - aws configure set region $AWS_DEFAULT_REGION
-  - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/$AWS_REGISTRY_NAME
+  before_script:
+    - apk add --no-cache curl jq python3 py3-pip
+    - pip install awscli
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set region $AWS_DEFAULT_REGION
+    - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/$AWS_REGISTRY_NAME
 
 variables:
   IMAGE_NAME: lychie-back-repo
 
 build_image:
   stage: build
+  extends:
+    - .build
   script:
     - docker build -t $IMAGE_NAME .
     - docker tag $IMAGE_NAME:latest public.ecr.aws/$AWS_REGISTRY_NAME/$IMAGE_NAME:latest
-
-push_image:
-  stage: push
-  script:
     - docker push public.ecr.aws/$AWS_REGISTRY_NAME/$IMAGE_NAME:latest
