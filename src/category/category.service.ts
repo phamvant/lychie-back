@@ -15,8 +15,14 @@ export class CategoryService {
       category.categoryName
     );
 
-    if (existedCategory.categorySubName.includes(category.categorySubName[0])) {
-      throw new ConflictException("category existed");
+    console.log(category);
+
+    if (existedCategory) {
+      if (
+        existedCategory.categorySubName.includes(category.categorySubName[0])
+      ) {
+        throw new ConflictException("category existed");
+      }
     }
 
     if (existedCategory) {
