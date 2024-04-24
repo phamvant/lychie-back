@@ -61,4 +61,9 @@ export class ProductController {
   async deleteProduct(@Body() productId: { productId: string }) {
     return await this.productService.deleteProduct(productId);
   }
+
+  @Get("page/:page")
+  async getProductByPage(@Param("page") page: number) {
+    return await this.productService.getProductByPage(page);
+  }
 }

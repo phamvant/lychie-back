@@ -124,4 +124,53 @@ export class S3BucketService {
 
     return { response };
   }
+
+  // async getAll() {
+  //   const BUCKET = "lychiebucket";
+  //   const command = new ListObjectsV2Command({
+  //     Bucket: BUCKET,
+  //     MaxKeys: 100,
+  //   });
+
+  //   console.log(BUCKET);
+
+  //   const res = await S3BucketService.client.send(command);
+
+  //   // const arr = res.Contents.map((content) => {
+  //   //   return !content.Key.includes("")
+  //   // });
+
+  //   const aa = res.Contents.map((aa) => {
+  //     if (!aa.Key.includes(".jpg")) {
+  //       return { Key: aa.Key };
+  //     }
+  //   });
+
+  //   const a = aa.filter((v) => v != null);
+
+  //   // const arr = a.filter((content) => !content.includes(".jpg"));
+
+  //   // for (const name of arr) {
+  //   //   let input = {
+  //   //     Bucket: BUCKET,
+  //   //     CopySource: `/${BUCKET}/${name}`,
+  //   //     Key: name + ".jpg",
+  //   //   };
+  //   //   let command = new CopyObjectCommand(input);
+  //   //   let response = await S3BucketService.client.send(command);
+  //   //   console.log(response);
+  //   // }
+
+  //   const input = {
+  //     Bucket: BUCKET,
+  //     Delete: {
+  //       Objects: a,
+  //       Quiet: false,
+  //     },
+  //   };
+  //   const command2 = new DeleteObjectsCommand(input);
+  //   const response = await S3BucketService.client.send(command2);
+
+  //   return response
+  // }
 }

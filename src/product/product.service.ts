@@ -12,14 +12,28 @@ import { CreateProductDto } from "./dto/product.dto";
 @Injectable()
 export class ProductService {
   constructor(
-    private prisma: PrismaService,
+    private prismaService: PrismaService,
     private userService: UserService,
     private cartService: CartService,
     private s3Service: S3BucketService
   ) {}
 
+  // async onModuleInit() {
+  //   // this.test();
+  // }
+
+  async getProductByPage(page: number, size = 12) {
+    console.log(page);
+    const products = await this.prismaService.product.findMany({
+      skip: page * size,
+      take: size,
+    });
+
+    return products;
+  }
+
   async findProductByName(productName: string) {
-    const product = await this.prisma.product.findFirst({
+    const product = await this.prismaService.product.findFirst({
       where: {
         productName: productName,
       },
@@ -29,7 +43,7 @@ export class ProductService {
   }
 
   async createProduct(dto: CreateProductDto, req: Request) {
-    const newProduct = await this.prisma.product.create({
+    const newProduct = await this.prismaService.product.create({
       data: dto,
     });
 
@@ -41,13 +55,13 @@ export class ProductService {
   }
 
   async getAllProduct() {
-    const products = await this.prisma.product.findMany();
+    const products = await this.prismaService.product.findMany();
 
     return products;
   }
 
   async getProductById(productId: string) {
-    const product = await this.prisma.product.findFirst({
+    const product = await this.prismaService.product.findFirst({
       where: {
         productId: productId,
       },
@@ -69,7 +83,7 @@ export class ProductService {
       }
     }
 
-    await this.prisma.product.update({
+    await this.prismaService.product.update({
       where: {
         productId: productId,
       },
@@ -99,7 +113,7 @@ export class ProductService {
       throw new BadRequestException("Cant delete s3 image");
     }
 
-    const deletedProduct = await this.prisma.product.delete({
+    const deletedProduct = await this.prismaService.product.delete({
       where: { productId: productId },
     });
 
@@ -115,5 +129,28 @@ export class ProductService {
   //     }
   //   }
   //   return "Updated";
+  // }
+
+  // async test() {
+  //   const array = await this.prismaService.product.findMany({
+  //     where: {},
+  //     select: {
+  //       productImages: true,
+  //     },
+  //   });
+
+  //   for (const arr of array) {
+  //     const data = arr.productImages.map((value) => value + ".jpg");
+  //     let a = await this.prismaService.product.updateMany({
+  //       where: {
+  //         productImages: {
+  //           has: arr.productImages[0],
+  //         },
+  //       },
+  //       data: {
+  //         productImages: data,
+  //       },
+  //     });
+  //   }
   // }
 }

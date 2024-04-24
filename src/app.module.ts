@@ -10,6 +10,9 @@ import { CategoryController } from "./category/category.controller";
 import { CategoryModule } from "./category/category.module";
 import { CategoryService } from "./category/category.service";
 import configuration from "./config/configuration";
+import { DiscountController } from "./discount/discount.controller";
+import { DiscountModule } from "./discount/discount.module";
+import { DiscountService } from "./discount/discount.service";
 import { PrismaService } from "./prisma/prisma.service";
 import { ProductModule } from "./product/product.module";
 import { ProductService } from "./product/product.service";
@@ -29,8 +32,9 @@ import { UserService } from "./user/user.service";
     S3BucketModule,
     CategoryModule,
     CartModule,
+    DiscountModule,
   ],
-  controllers: [AppController, CategoryController],
+  controllers: [AppController, CategoryController, DiscountController],
   providers: [
     AppService,
     PrismaService,
@@ -41,6 +45,7 @@ import { UserService } from "./user/user.service";
     JwtService,
     CartService,
     S3BucketService,
+    DiscountService,
   ],
 })
 export class AppModule {

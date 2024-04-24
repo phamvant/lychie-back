@@ -41,6 +41,16 @@ model Product {
   CartProduct           CartProduct[]
 }
 
+model Discount {
+  discountId          String  @id @default(auto()) @map("_id") @db.ObjectId
+  discountCode        String  @unique
+  discountDescription String
+  discountType        String
+  discountAmount      Int
+  discountIsActive    Boolean
+  discountIsApplyAll  Boolean
+}
+
 model Category {
   categoryId      String   @id @default(auto()) @map("_id") @db.ObjectId
   categoryName    String   @unique

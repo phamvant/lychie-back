@@ -19,4 +19,9 @@ export class S3BucketController {
 
     return uploadUrl;
   }
+
+  // @Get("")
+  // async getAll() {
+  //   return await this.s3BucketService.getAll();
+  // }
 }
