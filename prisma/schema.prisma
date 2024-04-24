@@ -25,7 +25,7 @@ model User {
 model Product {
   productId             String        @id @default(auto()) @map("_id") @db.ObjectId
   productName           String?       @unique
-  productCode           String
+  productCode           String        @unique
   productDescription    String
   productCostPrice      Int
   productPrice          Int

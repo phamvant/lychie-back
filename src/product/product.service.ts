@@ -120,6 +120,72 @@ export class ProductService {
     return { deletedProduct };
   }
 
+  calculateFinalPrice = (productPrice, discountType, discountAmount) => {
+    let finalPrice = productPrice;
+    if (discountType === "percentage") {
+      finalPrice -= (productPrice * discountAmount) / 100;
+    } else if (discountType === "fixed") {
+      finalPrice -= discountAmount;
+    }
+    return finalPrice;
+  };
+
+  async applyDiscountForAllProducts(
+    productDiscountType,
+    productDiscountAmount
+  ) {
+    const products = await this.prismaService.product.findMany({
+      select: {
+        productFinalPrice: true,
+        productDiscountType: true,
+        productPrice: true,
+        productDiscountAmount: true,
+        productCode: true,
+      },
+    });
+
+    for (const product of products) {
+      let finalPrice = this.calculateFinalPrice(
+        product.productPrice,
+        productDiscountType,
+        productDiscountAmount
+      );
+
+      await this.prismaService.product.update({
+        where: {
+          productCode: product.productCode,
+        },
+        data: {
+          productDiscountType: productDiscountType,
+          productDiscountAmount: productDiscountAmount,
+          productFinalPrice: finalPrice,
+        },
+      });
+    }
+  }
+
+  async removeDiscountForAllProducts() {
+    const products = await this.prismaService.product.findMany({
+      select: {
+        productPrice: true,
+        productCode: true,
+      },
+    });
+
+    for (const product of products) {
+      await this.prismaService.product.update({
+        where: {
+          productCode: product.productCode,
+        },
+        data: {
+          productFinalPrice: product.productPrice,
+          productDiscountAmount: 0,
+          productDiscountType: "",
+        },
+      });
+    }
+  }
+
   // async updateProductImage(files) {
   //   for (let i = 0; i < files.length; i++) {
   //     if (files[i].originalname !== "blob") {

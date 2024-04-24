@@ -24,5 +24,13 @@ export class DiscountController {
 
   @UseGuards(JwtGuard)
   @Put("active")
-  async activeDiscount(@Body() { discountCode }: { discountCode: string }) {}
+  async activeDiscount(@Body() { discountCode }: { discountCode: string }) {
+    return this.discountService.activeDiscount(discountCode);
+  }
+
+  @UseGuards(JwtGuard)
+  @Put("deactive")
+  async deactiveDiscount(@Body() { discountCode }: { discountCode: string }) {
+    return this.discountService.deactiveDiscount(discountCode);
+  }
 }
