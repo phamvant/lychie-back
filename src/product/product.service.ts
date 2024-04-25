@@ -186,6 +186,35 @@ export class ProductService {
     }
   }
 
+  async deleteProductImage(productId: string, imageLink: string) {
+    const product = await this.prismaService.product.findUnique({
+      where: {
+        productId: productId,
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException();
+    }
+
+    const newImageArray = product.productImages.filter(
+      (image) => image != imageLink
+    );
+
+    const deletedImage = await this.prismaService.product.update({
+      where: {
+        productId: productId,
+      },
+      data: {
+        productImages: newImageArray,
+      },
+    });
+
+    return deletedImage;
+  }
+
+  async;
+
   // async updateProductImage(files) {
   //   for (let i = 0; i < files.length; i++) {
   //     if (files[i].originalname !== "blob") {

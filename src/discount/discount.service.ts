@@ -37,7 +37,7 @@ export class DiscountService {
         discountIsActive: true,
       },
     });
-    console.log("Active");
+    console.log("Actived");
 
     return true;
   }
@@ -63,7 +63,7 @@ export class DiscountService {
         discountIsActive: false,
       },
     });
-    console.log("Deactive");
+    console.log("Deactived");
 
     return true;
   }

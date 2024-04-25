@@ -66,4 +66,13 @@ export class ProductController {
   async getProductByPage(@Param("page") page: number) {
     return await this.productService.getProductByPage(page);
   }
+
+  @UseGuards(JwtGuard)
+  @Put("image/delete")
+  async deleteProductImage(
+    @Body()
+    { productId, imageLink }: { productId: string; imageLink: string }
+  ) {
+    return await this.productService.deleteProductImage(productId, imageLink);
+  }
 }
