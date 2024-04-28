@@ -1,5 +1,0 @@
-services:
-  lychie-back:
-    image: public.ecr.aws/q2c1p2i6/lychie-back-repo
-    env_file:
-      - path: ./.env

@@ -1,8 +1,0 @@
-runtime: custom
-
-env: flex
-
-env_variables:
-  DATABASE_URL: mongodb+srv://phamvant:thuan286@lychie.v0qddbp.mongodb.net/?retryWrites=true&w=majority&appName=lychie
-  jwtSecretKey: '3e+9eSUw+8X5jN86WFNBN2Fxg8IkiP+R/0QYpInCYKw'
-  jwtRefreshTokenKey: 'o+qG20co6QUpN1ARtLOduev9r8W1GemZqPFjrh2brKU'
