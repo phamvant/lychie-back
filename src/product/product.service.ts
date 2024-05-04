@@ -50,9 +50,7 @@ export class ProductService {
       data: updateData,
     });
 
-    const updatedAmount = await this.userService.updateUserProductAmount(
-      user.userUsername
-    );
+    await this.userService.updateUserProductAmount(user.userUsername);
 
     return newProduct.productName;
   }
