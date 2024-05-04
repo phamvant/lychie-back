@@ -1,7 +1,7 @@
-image: ubuntu
+image: docker:stable
 
-# services:
-#   - docker:dind
+services:
+  - docker:dind
 
 default:
   tags:
@@ -11,17 +11,14 @@ stages:
   - build
   - release
 
-.aws_config:
+.build:
   before_script:
-    - apt update && apt install -y --no-install-recommends docker.io
-    - apt install curl jq python3 py3-pip wget
+    - apk add --no-cache curl jq python3 py3-pip
     - pip install awscli
     - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - aws configure set region $AWS_DEFAULT_REGION
     - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/$AWS_REGISTRY_NAME
-    - wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
-    - sudo dpkg -i amazon-ssm-agent.deb
 
 variables:
   IMAGE_NAME: lychie-back-repo
@@ -36,10 +33,20 @@ build_image:
     - docker push public.ecr.aws/$AWS_REGISTRY_NAME/$IMAGE_NAME:latest
 
 load_image:
+  image: ubuntu
   stage: release
-  extends:
-    - .aws_config
+  before_script:
+    - apt update
+    - apt install -y curl jq python3 python3-pip
+    - pip3 install awscli --break-system-packages
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set region $AWS_DEFAULT_REGION
+    - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/$AWS_REGISTRY_NAME
+
   script:
+    - wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
+    - dpkg -i amazon-ssm-agent.deb
     - aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["i-02aef90967cd313eb"]}]' --parameters '{"commands":["docker pull $(docker ps -a |grep back | awk '"'"'{print $2}'"'"')","docker-compose down -v","docker-compose up -d"],"workingDirectory":["/home/ec2-user"],"executionTimeout":["3600"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --region ap-northeast-1 --output text
     - DELETE_IMAGE=aws ecr-public describe-images --repository-name lychie-back-repo --region us-east-1 | grep imageDigest | head -n 1 | cut -d ':' -f 3
     - aws ecr-public batch-delete-image --repository-name lychie-back-repo --image-ids $DELETE_IMAGE
