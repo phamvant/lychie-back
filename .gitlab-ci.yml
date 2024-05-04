@@ -48,4 +48,4 @@ release:
     - dpkg -i amazon-ssm-agent.deb
     - aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["i-02aef90967cd313eb"]}]' --parameters '{"commands":["docker pull $(docker ps -a |grep back | awk '"'"'{print $2}'"'"')","docker-compose down -v","docker-compose up -d"],"workingDirectory":["/home/ec2-user"],"executionTimeout":["3600"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --region ap-northeast-1 --output text
     - echo $(aws ecr-public describe-images --repository-name lychie-back-repo --region us-east-1 | grep imageDigest | head -n 1 | awk '{print $2}') > DEL_IMG
-    - aws ecr-public batch-delete-image --repository-name lychie-back-repo --image-ids imageDigest=$(cat DEL_IMG) --region us-east-1
+    - cat DEL_IMG
