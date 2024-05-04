@@ -15,6 +15,8 @@ export class CategoryService {
       category.categoryName
     );
 
+    console.log(category);
+
     if (existedCategory) {
       if (
         existedCategory.categorySubName.includes(category.categorySubName[0])
