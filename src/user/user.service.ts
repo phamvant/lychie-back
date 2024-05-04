@@ -2,20 +2,25 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
 } from "@nestjs/common";
 import { hash } from "bcrypt";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateUserDto } from "./dto/user.dto";
+import { CartService } from "src/cart/cart.service";
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private cartService: CartService
+  ) {}
 
   //////////////////////////////////
   /// createUser
   //////////////////////////////////
   async create(dto: CreateUserDto) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         userEmail: dto.userEmail,
       },
@@ -23,7 +28,7 @@ export class UserService {
 
     if (user) throw new ConflictException("email duplicated");
 
-    const newUser = await this.prisma.user.create({
+    const newUser = await this.prismaService.user.create({
       data: {
         ...dto,
         userPassword: await hash(dto.userPassword, 10),
@@ -31,10 +36,20 @@ export class UserService {
       },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const newCart = await this.cartService.createNewUserCart(newUser.userId);
+
+    if (!newCart) {
+      await this.prismaService.user.delete({
+        where: {
+          userId: newUser.userId,
+        },
+      });
+
+      throw new ServiceUnavailableException("Cant create user");
+    }
+
     const { userPassword, ...res } = newUser;
 
-    console.log("created", res);
     return res;
   }
 
@@ -42,18 +57,14 @@ export class UserService {
   /// findByEmail
   //////////////////////////////////
   async findByEmail(email: string) {
-    console.log("find email", email);
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         userEmail: email,
       },
     });
 
-    console.log("user found", user);
-
     if (user) return user;
 
-    console.log("not found");
     throw new NotFoundException();
   }
 
@@ -61,7 +72,7 @@ export class UserService {
   /// findById
   //////////////////////////////////
   async findById(userId: string) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         userId: userId,
       },
@@ -74,18 +85,18 @@ export class UserService {
       },
     });
 
-    if (user) {
-      return user;
+    if (!user) {
+      throw new NotFoundException();
     }
 
-    throw new NotFoundException();
+    return user;
   }
 
   //////////////////////////////////
   /// updateUserProductAmount
   //////////////////////////////////
   async updateUserProductAmount(userName: string) {
-    await this.prisma.user.update({
+    return await this.prismaService.user.update({
       where: {
         userUsername: userName,
       },

@@ -18,14 +18,14 @@ model User {
   userPassword       String
   userAvatar         String?
   userProductsAmount Int
-  // userCart           Cart    @relation(fields: [cartCartId], references: [cartId])
-  // cartCartId         String  @db.ObjectId
+  userCart           Cart?
 }
 
 model Product {
   productId             String        @id @default(auto()) @map("_id") @db.ObjectId
   productName           String?       @unique
-  productCode           String        @unique
+  productCode           String
+  productShopId         String        @db.ObjectId
   productDescription    String
   productCostPrice      Int
   productPrice          Int
@@ -60,7 +60,8 @@ model Category {
 model Cart {
   cartId       String        @id @default(auto()) @map("_id") @db.ObjectId
   cartProducts CartProduct[]
-  // User         User[]
+  cartUser     User?         @relation(fields: [cartUserId], references: [userId])
+  cartUserId   String        @unique @db.ObjectId
 }
 
 model CartProduct {

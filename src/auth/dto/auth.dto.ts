@@ -1,4 +1,4 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString } from "class-validator";
 
 export class LoginDto {
   @IsString()
@@ -7,4 +7,14 @@ export class LoginDto {
 
   @IsString()
   password: string;
+}
+
+export class ReqUserPayload extends Request {
+  user: {
+    email: string;
+    sub: {
+      userid: string;
+      username: string;
+    };
+  };
 }

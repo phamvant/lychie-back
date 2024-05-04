@@ -18,12 +18,7 @@ export class ProductService {
     private s3Service: S3BucketService
   ) {}
 
-  // async onModuleInit() {
-  //   // this.test();
-  // }
-
   async getProductByPage(page: number, size = 12) {
-    console.log(page);
     const products = await this.prismaService.product.findMany({
       skip: page * size,
       take: size,
@@ -42,35 +37,67 @@ export class ProductService {
     return product;
   }
 
-  async createProduct(dto: CreateProductDto, req: Request) {
+  async createProduct(dto: CreateProductDto, userId: string) {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    const updateData = { productShopId: user.userId, ...dto };
+
     const newProduct = await this.prismaService.product.create({
-      data: dto,
+      data: updateData,
     });
 
-    await this.userService.updateUserProductAmount(
-      req["user"]["sub"]["username"]
+    const updatedAmount = await this.userService.updateUserProductAmount(
+      user.userUsername
     );
 
     return newProduct.productName;
   }
 
-  async getAllProduct() {
-    const products = await this.prismaService.product.findMany();
+  async getAllProduct(userId: string) {
+    const products = await this.prismaService.product.findMany({
+      where: {
+        productShopId: userId,
+      },
+    });
 
     return products;
   }
 
   async getProductById(productId: string) {
-    const product = await this.prismaService.product.findFirst({
+    const product = await this.prismaService.product.findUnique({
       where: {
         productId: productId,
       },
     });
+
     return product;
   }
 
-  async modifyProduct(productId: string, updateValue: Record<string, any>) {
+  async getUserProductById(productId: string, userId: string) {
     const product = await this.getProductById(productId);
+
+    if (!product) {
+      throw new NotFoundException();
+    }
+
+    //TODO Security
+    if (product.productShopId != userId) {
+      throw new NotFoundException();
+    }
+
+    return product;
+  }
+
+  async modifyProduct(
+    productId: string,
+    updateValue: Record<string, any>,
+    userId: string
+  ) {
+    const product = await this.getUserProductById(productId, userId);
 
     if (!product) {
       throw new BadRequestException();
@@ -93,8 +120,8 @@ export class ProductService {
     return updateValue;
   }
 
-  async deleteProduct({ productId }: { productId: string }) {
-    const product = await this.getProductById(productId);
+  async deleteProduct(productId: string, userId: string) {
+    const product = await this.getUserProductById(productId, userId);
 
     if (!product) {
       throw new NotFoundException("No product found");
@@ -141,6 +168,7 @@ export class ProductService {
         productPrice: true,
         productDiscountAmount: true,
         productCode: true,
+        productId: true,
       },
     });
 
@@ -153,7 +181,7 @@ export class ProductService {
 
       await this.prismaService.product.update({
         where: {
-          productCode: product.productCode,
+          productId: product.productId,
         },
         data: {
           productDiscountType: productDiscountType,
@@ -169,13 +197,14 @@ export class ProductService {
       select: {
         productPrice: true,
         productCode: true,
+        productId: true,
       },
     });
 
     for (const product of products) {
       await this.prismaService.product.update({
         where: {
-          productCode: product.productCode,
+          productId: product.productId,
         },
         data: {
           productFinalPrice: product.productPrice,
@@ -186,12 +215,12 @@ export class ProductService {
     }
   }
 
-  async deleteProductImage(productId: string, imageLink: string) {
-    const product = await this.prismaService.product.findUnique({
-      where: {
-        productId: productId,
-      },
-    });
+  async deleteProductImage(
+    productId: string,
+    imageLink: string,
+    userId: string
+  ) {
+    const product = await this.getUserProductById(productId, userId);
 
     if (!product) {
       throw new NotFoundException();
@@ -212,8 +241,6 @@ export class ProductService {
 
     return deletedImage;
   }
-
-  async;
 
   // async updateProductImage(files) {
   //   for (let i = 0; i < files.length; i++) {

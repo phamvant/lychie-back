@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from "@nestjs/common";
 import { JwtGuard } from "src/auth/guards/jwt.guard";
 import { AddProductToCardDto, ChangeCartProductAmountDto } from "./cart.dto";
 import { CartService } from "./cart.service";
@@ -7,10 +14,10 @@ import { CartService } from "./cart.service";
 export class CartController {
   constructor(private cartService: CartService) {}
 
-  // @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   @Get("")
-  async getAllCartProduct() {
-    return await this.cartService.getAllCartProduct();
+  async getAllCartProduct(@Request() req) {
+    return await this.cartService.getAllCartProduct(req.user.sub.userid);
   }
 
   @UseGuards(JwtGuard)
@@ -22,7 +29,6 @@ export class CartController {
   // @UseGuards(JwtGuard)
   @Post("delete")
   async deleteCartProduct(@Body() cartProductId: { cartProductId: string }) {
-    console.log(cartProductId);
     return await this.cartService.deleteCartProduct(cartProductId);
   }
 

@@ -13,28 +13,10 @@ export class SeedService {
       },
     });
 
-    const existedCart = await this.prismaService.cart.findFirst({
-      where: {
-        cartId: cartId,
-      },
-    });
-
     if (!existed) {
       const newCategory = await this.prismaService.category.createMany({
         data: category,
       });
-
-      console.log("created category");
-    }
-
-    if (!existedCart) {
-      const newCart = await this.prismaService.cart.create({
-        data: {
-          cartId: cartId,
-        },
-      });
-
-      console.log("created cart");
     }
   }
 }

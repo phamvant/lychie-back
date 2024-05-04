@@ -1,14 +1,44 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { getChangedFields } from "src/utils/fields.check";
 import { AddProductToCardDto } from "./cart.dto";
+import { UserService } from "src/user/user.service";
 
 @Injectable()
 export class CartService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAllCartProduct() {
-    const allCartProduct = this.prismaService.cartProduct.findMany({
+  private async findCartByUserId(userId: string) {
+    const cart = await this.prismaService.cart.findUniqueOrThrow({
+      where: {
+        cartUserId: userId,
+      },
+    });
+
+    return cart;
+  }
+
+  async createNewUserCart(userId: string) {
+    const newCart = await this.prismaService.cart.create({
+      data: {
+        cartUserId: userId,
+      },
+    });
+
+    return newCart;
+  }
+
+  async getAllCartProduct(userId: string) {
+    const cart = await this.findCartByUserId(userId);
+
+    if (!cart) {
+      throw new NotFoundException();
+    }
+
+    const allCartProduct = await this.prismaService.cartProduct.findMany({
+      where: {
+        cartCartId: cart.cartId,
+      },
       include: {
         cartProduct: {
           select: {

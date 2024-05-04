@@ -6,6 +6,7 @@ import { UserModule } from "src/user/user.module";
 import { UserService } from "src/user/user.service";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
+import { CartService } from "src/cart/cart.service";
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { AuthService } from "./auth.service";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UserService, PrismaService, JwtService],
+  providers: [AuthService, UserService, PrismaService, JwtService, CartService],
   exports: [AuthService],
 })
 export class AuthModule {}

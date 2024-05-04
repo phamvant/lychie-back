@@ -18,8 +18,6 @@ export class AuthService {
   async refreshToken(user: any) {
     const payload = { email: user.email, sub: user.sub };
 
-    console.log("refresh payload", payload);
-
     return {
       backendTokens: {
         accessToken: await this.jwtService.signAsync(payload, {
@@ -36,14 +34,13 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    console.log("login", dto);
     const user = await this.validateUser(dto);
-    console.log(user);
 
     const payload = {
       email: user.userEmail,
       sub: {
         username: user.userUsername,
+        userid: user.userId,
       },
     };
 
@@ -67,7 +64,6 @@ export class AuthService {
     const user = await this.userService.findByEmail(dto.email);
 
     if (user && (await compare(dto.password, user.userPassword))) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { userPassword, ...res } = user;
       return res;
     }

@@ -11,6 +11,7 @@ import {
 import { JwtGuard } from "src/auth/guards/jwt.guard";
 import { CreateProductDto } from "./dto/product.dto";
 import { ProductService } from "./product.service";
+import { ReqUserPayload } from "src/auth/dto/auth.dto";
 
 // @Controller("product")
 // export class PostController {
@@ -29,37 +30,55 @@ export class ProductController {
 
   @UseGuards(JwtGuard)
   @Post("create")
-  async createProduct(@Body() dto: CreateProductDto, @Request() req) {
-    console.log(dto);
-    return await this.productService.createProduct(dto, req);
+  async createProduct(
+    @Body() dto: CreateProductDto,
+    @Request() req: ReqUserPayload
+  ) {
+    return await this.productService.createProduct(dto, req.user.sub.userid);
   }
 
   @UseGuards(JwtGuard)
   @Get("")
-  async getAllProduct() {
-    return this.productService.getAllProduct();
+  async getAllProduct(@Request() req: ReqUserPayload) {
+    return this.productService.getAllProduct(req.user.sub.userid);
   }
 
   @UseGuards(JwtGuard)
   @Get(":productId")
-  async getProductById(@Param("productId") productId: string) {
-    return this.productService.getProductById(productId);
+  async getProductById(
+    @Param("productId") productId: string,
+    @Request() req: ReqUserPayload
+  ) {
+    return this.productService.getUserProductById(
+      productId,
+      req.user.sub.userid
+    );
   }
 
   @UseGuards(JwtGuard)
   @Put("modify/:productId")
   async modifyProduct(
     @Param("productId") productId: string,
-    @Body() updateValues: Record<string, any>
+    @Body() updateValues: Record<string, any>,
+    @Request() req: ReqUserPayload
   ) {
-    console.log("Modify request : ", productId, "->", updateValues);
-    return this.productService.modifyProduct(productId, updateValues);
+    return this.productService.modifyProduct(
+      productId,
+      updateValues,
+      req.user.sub.userid
+    );
   }
 
   @UseGuards(JwtGuard)
   @Put("delete")
-  async deleteProduct(@Body() productId: { productId: string }) {
-    return await this.productService.deleteProduct(productId);
+  async deleteProduct(
+    @Body() { productId }: { productId: string },
+    @Request() req: ReqUserPayload
+  ) {
+    return await this.productService.deleteProduct(
+      productId,
+      req.user.sub.userid
+    );
   }
 
   @Get("page/:page")
@@ -71,8 +90,13 @@ export class ProductController {
   @Put("image/delete")
   async deleteProductImage(
     @Body()
-    { productId, imageLink }: { productId: string; imageLink: string }
+    { productId, imageLink }: { productId: string; imageLink: string },
+    @Request() req: ReqUserPayload
   ) {
-    return await this.productService.deleteProductImage(productId, imageLink);
+    return await this.productService.deleteProductImage(
+      productId,
+      imageLink,
+      req.user.sub.userid
+    );
   }
 }
