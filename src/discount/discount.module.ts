@@ -14,10 +14,11 @@ import { DiscountService } from "./discount.service";
     JwtService,
     DiscountService,
     ProductService,
+    S3BucketService,
     UserService,
     CartService,
-    S3BucketService,
   ],
   controllers: [DiscountController],
+  exports: [DiscountService],
 })
 export class DiscountModule {}

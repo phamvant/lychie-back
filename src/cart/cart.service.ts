@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { getChangedFields } from "src/utils/fields.check";
 import { AddProductToCardDto } from "./cart.dto";
-import { UserService } from "src/user/user.service";
+import { ProductService } from "src/product/product.service";
 
 @Injectable()
 export class CartService {
@@ -35,31 +40,42 @@ export class CartService {
       throw new NotFoundException();
     }
 
-    const allCartProduct = await this.prismaService.cartProduct.findMany({
+    const allCartProduct = await this.prismaService.cart.findUnique({
       where: {
-        cartCartId: cart.cartId,
+        cartUserId: userId,
       },
       include: {
-        cartProduct: {
-          select: {
-            productCode: true,
-            productPrice: true,
-            productFinalPrice: true,
+        cartProducts: {
+          include: {
+            cartProduct: {
+              select: {
+                productCode: true,
+                productPrice: true,
+                productFinalPrice: true,
+              },
+            },
           },
         },
       },
     });
 
-    return allCartProduct;
+    return allCartProduct.cartProducts;
   }
 
-  async addProductToCart(newProduct: AddProductToCardDto) {
-    const existedProduct = await this.prismaService.cartProduct.findMany({
-      where: { productId: newProduct.productId },
-    });
+  async addProductToCart(newProduct: AddProductToCardDto, userId: string) {
+    const cart = await this.findCartByUserId(userId);
 
-    if (existedProduct) {
-      const duplicated = existedProduct
+    if (!cart) {
+      throw new NotFoundException();
+    }
+
+    const existedProducts = await this.findProductInCartById(
+      newProduct.productId,
+      userId
+    );
+
+    if (existedProducts) {
+      const duplicated = existedProducts.cartProducts
         .filter(
           (product) =>
             !Object.keys(
@@ -86,8 +102,15 @@ export class CartService {
 
     const { ...updateData } = newProduct;
 
-    const newCartProduct = await this.prismaService.cartProduct.create({
-      data: { cartCartId: "661e9520d5c458cbcfcf3117", ...updateData },
+    const newCartProduct = await this.prismaService.cart.update({
+      where: {
+        cartId: cart.cartId,
+      },
+      data: {
+        cartProducts: {
+          create: [updateData],
+        },
+      },
     });
 
     return { newCartProduct };
@@ -106,7 +129,24 @@ export class CartService {
     return { updatedProduct };
   }
 
-  async deleteCartProduct({ cartProductId }: { cartProductId: string }) {
+  async deleteCartProduct(cartProductId: string, userId: string) {
+    const cartProduct = await this.prismaService.cart.findUnique({
+      where: {
+        cartUserId: userId,
+      },
+      include: {
+        cartProducts: {
+          where: {
+            cartProductId: cartProductId,
+          },
+        },
+      },
+    });
+
+    if (!cartProduct.cartProducts) {
+      throw new NotFoundException();
+    }
+
     const deletedProduct = await this.prismaService.cartProduct.delete({
       where: {
         cartProductId: cartProductId,
@@ -116,13 +156,20 @@ export class CartService {
     return { deletedProduct };
   }
 
-  async findProductInCartById(productId: string) {
-    const isProductInCart = await this.prismaService.cartProduct.findFirst({
+  async findProductInCartById(productId: string, userId: string) {
+    const existedProducts = await this.prismaService.cart.findUnique({
       where: {
-        productId: productId,
+        cartUserId: userId,
+      },
+      include: {
+        cartProducts: {
+          where: {
+            productId: productId,
+          },
+        },
       },
     });
 
-    return isProductInCart ? true : false;
+    return existedProducts ? existedProducts : false;
   }
 }

@@ -9,6 +9,7 @@ import {
 import { JwtGuard } from "src/auth/guards/jwt.guard";
 import { AddProductToCardDto, ChangeCartProductAmountDto } from "./cart.dto";
 import { CartService } from "./cart.service";
+import { ReqUserPayload } from "src/auth/dto/auth.dto";
 
 @Controller("cart")
 export class CartController {
@@ -22,14 +23,26 @@ export class CartController {
 
   @UseGuards(JwtGuard)
   @Post("add")
-  async addProductToCart(@Body() product: AddProductToCardDto) {
-    return await this.cartService.addProductToCart(product);
+  async addProductToCart(
+    @Body() product: AddProductToCardDto,
+    @Request() req: ReqUserPayload
+  ) {
+    return await this.cartService.addProductToCart(
+      product,
+      req.user.sub.userid
+    );
   }
 
-  // @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   @Post("delete")
-  async deleteCartProduct(@Body() cartProductId: { cartProductId: string }) {
-    return await this.cartService.deleteCartProduct(cartProductId);
+  async deleteCartProduct(
+    @Body() { cartProductId }: { cartProductId: string },
+    @Request() req: ReqUserPayload
+  ) {
+    return await this.cartService.deleteCartProduct(
+      cartProductId,
+      req.user.sub.userid
+    );
   }
 
   @UseGuards(JwtGuard)

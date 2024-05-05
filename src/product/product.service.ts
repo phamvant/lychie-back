@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from "@nestjs/common";
 import { CartService } from "src/cart/cart.service";
 import { PrismaService } from "src/prisma/prisma.service";
@@ -13,9 +15,9 @@ import { CreateProductDto } from "./dto/product.dto";
 export class ProductService {
   constructor(
     private prismaService: PrismaService,
+    private s3Service: S3BucketService,
     private userService: UserService,
-    private cartService: CartService,
-    private s3Service: S3BucketService
+    private cartService: CartService
   ) {}
 
   async getProductByPage(page: number, size = 12) {
@@ -127,8 +129,10 @@ export class ProductService {
       throw new NotFoundException("No product found");
     }
 
-    const isProductInCart =
-      await this.cartService.findProductInCartById(productId);
+    const isProductInCart = await this.cartService.findProductInCartById(
+      productId,
+      userId
+    );
 
     if (isProductInCart) {
       throw new BadRequestException("Product in cart");

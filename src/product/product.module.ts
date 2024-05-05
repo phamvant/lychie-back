@@ -6,6 +6,7 @@ import { S3BucketService } from "src/s3/s3.service";
 import { UserService } from "src/user/user.service";
 import { ProductController } from "./product.controller";
 import { ProductService } from "./product.service";
+import { UserModule } from "src/user/user.module";
 
 @Module({
   providers: [
@@ -16,6 +17,8 @@ import { ProductService } from "./product.service";
     CartService,
     S3BucketService,
   ],
+  imports: [UserModule],
   controllers: [ProductController],
+  exports: [ProductService],
 })
 export class ProductModule {}
