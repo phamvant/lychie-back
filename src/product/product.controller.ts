@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
 } from "@nestjs/common";
@@ -37,11 +38,11 @@ export class ProductController {
     return await this.productService.createProduct(dto, req.user.sub.userid);
   }
 
-  @UseGuards(JwtGuard)
-  @Get("")
-  async getAllProduct(@Request() req: ReqUserPayload) {
-    return this.productService.getAllProduct(req.user.sub.userid);
-  }
+  // @UseGuards(JwtGuard)
+  // @Get("")
+  // async getAllProduct(@Request() req: ReqUserPayload) {
+  //   return this.productService.getAllProduct(req.user.sub.userid);
+  // }
 
   @UseGuards(JwtGuard)
   @Get(":productId")
@@ -81,8 +82,9 @@ export class ProductController {
     );
   }
 
-  @Get("page/:page")
-  async getProductByPage(@Param("page") page: number) {
+  @UseGuards(JwtGuard)
+  @Get("")
+  async getProductByPage(@Query("page") page: number) {
     return await this.productService.getProductByPage(page);
   }
 

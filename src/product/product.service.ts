@@ -20,6 +20,17 @@ export class ProductService {
     private cartService: CartService
   ) {}
 
+  async checkIfProductBelong(productId: string, userId: string) {
+    const product = this.prismaService.product.findUnique({
+      where: {
+        productId: productId,
+        productShopId: userId,
+      },
+    });
+
+    return product;
+  }
+
   async getProductByPage(page: number, size = 12) {
     const products = await this.prismaService.product.findMany({
       skip: page * size,
@@ -245,38 +256,4 @@ export class ProductService {
 
     return deletedImage;
   }
-
-  // async updateProductImage(files) {
-  //   for (let i = 0; i < files.length; i++) {
-  //     if (files[i].originalname !== "blob") {
-  //       let filePath = `uploads/${files[i].originalname}`; // Assuming 'uploads' directory exists
-  //       await fs.promises.writeFile(filePath, files[i].buffer); // Use promises for async
-  //       console.log("Image saved:", filePath);
-  //     }
-  //   }
-  //   return "Updated";
-  // }
-
-  // async test() {
-  //   const array = await this.prismaService.product.findMany({
-  //     where: {},
-  //     select: {
-  //       productImages: true,
-  //     },
-  //   });
-
-  //   for (const arr of array) {
-  //     const data = arr.productImages.map((value) => value + ".jpg");
-  //     let a = await this.prismaService.product.updateMany({
-  //       where: {
-  //         productImages: {
-  //           has: arr.productImages[0],
-  //         },
-  //       },
-  //       data: {
-  //         productImages: data,
-  //       },
-  //     });
-  //   }
-  // }
 }

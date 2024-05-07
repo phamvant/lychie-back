@@ -31,6 +31,6 @@ import { UserModule } from "./user/user.module";
 export class AppModule {
   constructor(private seedService: SeedService) {}
   async onModuleInit() {
-    await this.seedService.seedDatabase(seedData, seedCart); // Seed the database only on first startup}
+    await this.seedService.seedDatabase(seedData, seedCart); // Seed the database only on first startup
   }
 }

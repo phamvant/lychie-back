@@ -11,7 +11,11 @@ import { ProductService } from "src/product/product.service";
 
 @Injectable()
 export class CartService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    @Inject(forwardRef(() => ProductService))
+    productService: ProductService
+  ) {}
 
   private async findCartByUserId(userId: string) {
     const cart = await this.prismaService.cart.findUniqueOrThrow({
@@ -68,6 +72,8 @@ export class CartService {
     if (!cart) {
       throw new NotFoundException();
     }
+
+    // const isProductBelong = await this.pro;
 
     const existedProducts = await this.findProductInCartById(
       newProduct.productId,
@@ -170,6 +176,6 @@ export class CartService {
       },
     });
 
-    return existedProducts ? existedProducts : false;
+    return existedProducts.cartProducts ? existedProducts : false;
   }
 }
