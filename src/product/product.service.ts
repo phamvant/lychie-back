@@ -31,7 +31,7 @@ export class ProductService {
     return product;
   }
 
-  async getProductByPage(page: number, userId: string, size = 12) {
+  async getProductByPage(page: number, userId: string, size = 8) {
     if (!page) {
       throw new BadRequestException();
     }
