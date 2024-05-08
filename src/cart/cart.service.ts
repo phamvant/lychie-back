@@ -12,9 +12,9 @@ import { ProductService } from "src/product/product.service";
 @Injectable()
 export class CartService {
   constructor(
-    private prismaService: PrismaService,
-    @Inject(forwardRef(() => ProductService))
-    productService: ProductService
+    private prismaService: PrismaService
+    // @Inject(forwardRef(() => ProductService))
+    // productService: ProductService
   ) {}
 
   private async findCartByUserId(userId: string) {

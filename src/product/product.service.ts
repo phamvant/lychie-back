@@ -31,12 +31,18 @@ export class ProductService {
     return product;
   }
 
-  async getProductByPage(page: number, size = 12) {
+  async getProductByPage(page: number, userId: string, size = 12) {
+    if (!page) {
+      throw new BadRequestException();
+    }
+
     const products = await this.prismaService.product.findMany({
+      where: {
+        productShopId: userId,
+      },
       skip: page * size,
       take: size,
     });
-
     return products;
   }
 

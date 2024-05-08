@@ -84,8 +84,14 @@ export class ProductController {
 
   @UseGuards(JwtGuard)
   @Get("")
-  async getProductByPage(@Query("page") page: number) {
-    return await this.productService.getProductByPage(page);
+  async getProductByPage(
+    @Query("page") page: number,
+    @Request() req: ReqUserPayload
+  ) {
+    return await this.productService.getProductByPage(
+      page,
+      req.user.sub.userid
+    );
   }
 
   @UseGuards(JwtGuard)
